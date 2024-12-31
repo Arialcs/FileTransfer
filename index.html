@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Upload Video or Image</title>
+    <style>
+      /* General styles */
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        flex-direction: column;
+      }
+
+      h1 {
+        font-size: 24px;
+        margin-bottom: 20px;
+      }
+
+      #uploadForm {
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 400px;
+      }
+
+      input[type="file"] {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+      }
+
+      input[type="submit"] {
+        display: block;
+        width: 100%;
+        padding: 12px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+
+      input[type="submit"]:hover {
+        background-color: #0056b3;
+      }
+
+      #loading {
+        display: none;
+        width: 100%;
+        margin-top: 20px;
+      }
+
+      #progress-bar {
+        width: 0;
+        height: 30px;
+        background-color: #4caf50;
+        border-radius: 5px;
+        transition: width 0.1s;
+      }
+
+      #result {
+        margin-top: 20px;
+        text-align: center;
+      }
+
+      /* Responsive design */
+      @media (max-width: 600px) {
+        h1 {
+          font-size: 20px;
+        }
+
+        input[type="file"],
+        input[type="submit"] {
+          padding: 15px;
+          font-size: 18px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Upload New Video or Image</h1>
+
+    <form
+      id="uploadForm"
+      action="/"
+      method="POST"
+      enctype="multipart/form-data"
+    >
+      <input type="file" name="file" id="fileInput" required />
+      <input type="submit" value="Upload" />
+    </form>
+
+    <div id="loading">
+      <p>Uploading... Please wait.</p>
+      <div id="progress-bar"></div>
+    </div>
+
+    <div id="result"></div>
+
+    <script>
+      document.getElementById("uploadForm").onsubmit = function (event) {
+        event.preventDefault(); // Prevent the default form submission behavior
+        document.getElementById("loading").style.display = "block"; // Show loading progress
+        document.getElementById("progress-bar").style.width = "0"; // Reset progress bar to 0%
+        document.getElementById("result").innerHTML = ""; // Clear previous results
+
+        var formData = new FormData(document.getElementById("uploadForm"));
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "/", true);
+
+        // Update progress bar
+        xhr.upload.onprogress = function (event) {
+          if (event.lengthComputable) {
+            var percent = (event.loaded / event.total) * 100;
+            document.getElementById("progress-bar").style.width = percent + "%";
+          }
+        };
+
+        // When the request is complete (success or failure)
+        xhr.onload = function () {
+          if (xhr.status === 200) {
+            document.getElementById("result").innerHTML =
+              "File uploaded successfully!";
+          } else {
+            document.getElementById("result").innerHTML =
+              "Error uploading file!";
+          }
+          document.getElementById("loading").style.display = "none"; // Hide the loading bar
+        };
+
+        // Send the form data
+        xhr.send(formData);
+      };
+    </script>
+  </body>
+</html>
